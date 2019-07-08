@@ -1,4 +1,4 @@
-# vue-waimai
+# vue-Take-out
 
 ## Project setup
 ```
