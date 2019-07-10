@@ -6,7 +6,7 @@
     </div>
     <div class="shop_container">
       <ul class="shop_list">
-        <li class="shop_li border-1px" v-for="shop in shops" :key="shop.name">
+        <li class="shop_li border-1px" v-for="shop in shops" :key="shop.name" @click="$router.push('/shop')">
           <a>
             <div class="shop_left">
               <img class="shop_img" :src="'https://fuss10.elemecdn.com' + shop.image_path"/>
@@ -25,7 +25,7 @@
                   <div class="order_section">月售{{shop.recent_order_num}}单</div>
                 </section>
                 <section class="shop_rating_order_right">
-                  <span class="delivery_style delivery_right">{{shop.delivery_mode.text}}</span>
+                  <span class="delivery_style delivery_right">闪电专送</span>
                 </section>
               </section>
               <section class="shop_distance">
@@ -49,7 +49,9 @@
   export default {
     name: 'ShopList',
     computed: {
-      ...mapState(['shops'])
+      ...mapState({
+        shops: state => state.home.shops
+      })
     },
     components: {
       Star

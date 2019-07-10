@@ -12,9 +12,9 @@
         <form>
           <div :class="{on: loginType}">
             <section class="login_message">
-              <input type="tel" maxlength="11" placeholder="手机号" v-model="phoneNumber">
+              <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
               <button 
-                :disabled="!isRightNumber" 
+                :disabled="!isRightNumber || computeTime > 0 " 
                 class="get_verification" 
                 :class="{right_phone_number: isRightNumber}"
                 @click.prevent="sendCode"
@@ -23,7 +23,7 @@
               </button>
             </section>
             <section class="login_verification">
-              <input type="tel" maxlength="8" placeholder="验证码">
+              <input type="tel" maxlength="8" placeholder="验证码" v-model="code">
             </section>
             <section class="login_hint">
               温馨提示：未注册Take-out帐号的手机号，登录时将自动注册，且代表已同意
@@ -33,26 +33,32 @@
           <div :class="{on: !loginType}">
             <section>
               <section class="login_message">
-                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名">
+                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名" v-model="name">
               </section>
               <section class="login_verification">
-                <input type="tel" maxlength="8" placeholder="密码">
-                <div class="switch_button off" :class="isShowPwd ? 'on' : 'off'" @click="isShowPwd = !isShowPwd" >
+                <input type="tel" maxlength="8" placeholder="密码" v-model="password">
+                <div class="switch_button off" :class="isShowPwd ? 'on' : 'off'" @click.prevent="isShowPwd = !isShowPwd" >
                   <div class="switch_circle" :class="{right: isShowPwd}"></div>
                   <span class="switch_text">{{isShowPwd ? 'abc' : ''}}</span>
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
+                <img
+                  class="get_verification" 
+                  src="http://localhost:5000/captcha"
+                  alt="captcha"
+                  ref="captcha"
+                  @click="updateCaptcha"
+                />
               </section>
             </section>
           </div>
-          <button class="login_submit">登录</button>
+          <button class="login_submit" @click.prevent="login">登录</button>
         </form>
         <a href="javascript:;" class="about_us">关于我们</a>
       </div>
-      <a href="javascript:" class="go_back" @click="$router.back()">
+      <a href="javascript:" class="go_back" @click.prevent="$router.back()">
         <i class="iconfont icon-jiantou2"></i>
       </a>
     </div>
@@ -60,30 +66,64 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import { reqPhoneCode, reqCodeLogin, reqPwdLogin } from '../../api/index'
   export default {
     name: 'Login',
     data() {
       return {
         loginType: true,  //true为短信登录，false为密码登录
-        phoneNumber: '',
+        phone: '',
+        name: '',
+        code: '',
+        password: '',
+        captcha: '',
         computeTime: 0,
         isShowPwd: false
       }
     },
     computed: {
       isRightNumber() {
-        return /^1\d{10}$/.test(this.phoneNumber)
+        return /^1\d{10}$/.test(this.phone)
       }
     },
     methods: {
-      sendCode() {
+      async sendCode() {
         this.computeTime = 30
         const intervalId = setInterval(() => {
           this.computeTime--
           if (this.computeTime === 0) {
             clearInterval(intervalId)
           }
-        }, 1000);
+        }, 1000)
+
+        const result = await reqPhoneCode(this.phone)
+        if (result.code === 0) {
+          alert('短信发送成功')
+        } else {
+          alert(result.msg)
+        }
+      },
+
+      updateCaptcha() {
+        this.$refs.captcha.src = 'http://localhost:5000/captcha?time=' + Date.now()
+      },
+
+      async login() {
+        let result
+        const { loginType, name, code, password, phone, captcha } = this
+        if (loginType) {
+          result = await reqCodeLogin({phone, code})
+        } else {
+          result = await reqPwdLogin({name, captcha, password})
+        }
+
+        if (result.code === 0) {
+          const user = result.data
+          this.$store.dispatch('recordUser', user)
+          this.$router.replace('/personal')
+        } else {
+          alert(result.msg)
+        }
       }
     }
   }

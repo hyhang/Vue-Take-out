@@ -11,6 +11,9 @@
     name: 'App',
     components: {
       FooterGuied
+    },
+    mounted() {
+      this.$store.dispatch('autoLogin')
     }
   }
 </script>

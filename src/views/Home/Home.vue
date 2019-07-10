@@ -45,7 +45,10 @@
       ShopList
     },
     computed : {
-      ...mapState(['address', 'categories']),
+      ...mapState({
+        address: state => state.home.address,
+        categories: state => state.home.categories
+      }),
 
       categoriesArr () {
         const bigArr = []
