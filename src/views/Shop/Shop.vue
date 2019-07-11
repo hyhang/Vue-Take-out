@@ -3,7 +3,7 @@
     <ShopHeader/>  
     <div class="tab">
       <div class="tab-item">
-        <router-link to="/shop/foods" replace>点餐</router-link>
+        <router-link to="/shop/goods" replace>点餐</router-link>
       </div>
       <div class="tab-item">
         <router-link to="/shop/ratings" replace>评价</router-link>
@@ -22,6 +22,11 @@
     name: 'Shop',
     components: {
       ShopHeader
+    },
+    mounted() {
+      this.$store.dispatch('getShopInfo')
+      this.$store.dispatch('getShopGoods')
+      this.$store.dispatch('getShopRatings')
     }
   }
 </script>

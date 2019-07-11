@@ -4,7 +4,7 @@ import Personal from '../views/Personal/Personal.vue'
 import Search from '../views/Search/Search.vue'
 import Login from '../views/Login/Login.vue'
 import Shop from '../views/Shop/Shop.vue'
-import Foods from '../views/Shop/Foods/Foods.vue'
+import Goods from '../views/Shop/Goods/Goods.vue'
 import Info from '../views/Shop/Info/Info.vue'
 import Ratings from '../views/Shop/Ratings/Ratings.vue'
 
@@ -50,8 +50,8 @@ export default [
     component: Shop,
     children: [
       {
-        path: '/shop/foods',
-        component: Foods,
+        path: '/shop/goods',
+        component: Goods,
       },
       {
         path: '/shop/ratings',
@@ -63,7 +63,7 @@ export default [
       },
       {
         path: '',
-        redirect: '/shop/foods'
+        redirect: '/shop/goods'
       }
     ]
   }

@@ -5,6 +5,7 @@ import store from './vuex/store'
 import { Button } from 'mint-ui'
 import Header from './components/Header/Header.vue'
 import Star from './components/Star/Star.vue'
+import  './mock/mockServer'
 Vue.config.productionTip = false
 
 Vue.component('Header', Header)
