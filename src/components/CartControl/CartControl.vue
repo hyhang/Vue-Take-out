@@ -1,14 +1,24 @@
 <template>
   <div class="cartcontrol">
-    <div class="iconfont icon-remove_circle_outline"></div>
-    <div class="cart-count">1</div>
-    <div class="iconfont icon-add_circle"></div>
+    <transition name="move">
+      <div class="iconfont icon-remove_circle_outline" @click.stop="upCount(false)"  v-if="food.count"></div>
+    </transition>
+    <div class="cart-count" v-if="food.count">{{food.count}}</div>
+    <div class="iconfont icon-add_circle" @click.stop="upCount(true)"></div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   export default {
-    name:'CartControl'
+    name:'CartControl',
+    props: {
+      food: Object
+    },
+    methods: {
+      upCount(isAdd){
+        this.$store.dispatch('updateCount', {isAdd, food: this.food})
+      }
+    }
   }
 </script>
 
@@ -29,6 +39,11 @@
       line-height 24px
       font-size 24px
       color $green
+      &.move-enter-active,&.move-leave-active
+        transition all 0.5s
+      &.move-enter,&.move-leave-to
+        opacity 0
+        transform translateX(15px) rotate(180deg)
     .cart-count
       display: inline-block
       vertical-align: top

@@ -1,65 +1,76 @@
 <template>
-  <div>
-    <div class="goods">
-    <div class="menu-wrapper" ref="leftWrapper">
-      <ul ref="leftUl">
-        <li 
-          class="menu-item" 
-          :class="{current : currentIndex === index}" 
-          v-for="(goods, index) in goods" 
-          :key="goods.name"
-          @click="clickItem(index)"
-        >
-          <span class="text bottom-border-1px">
-            <img class="icon" :src="goods.icon" v-if="goods.icon">
-            {{goods.name}}
-          </span>
-        </li>
-      </ul>
-    </div>
-    <div class="foods-wrapper" ref="rightWrapper">
-      <ul ref="rightUl">
-        <li class="food-list-hook" v-for="goods in goods" :key="goods.name">
-          <h1 class="title">{{goods.name}}</h1>
-          <ul>
-            <li class="food-item bottom-border-1px" v-for="food in goods.foods" :key="food.name">
-              <div class="icon">
-                <img width="57" height="57" :src="food.icon">
-              </div>
-              <div class="content">
-                <h2 class="name">{{food.name}}</h2>
-                <p class="desc">{{food.description}}</p>
-                <div class="extra">
-                  <span class="count">月售{{food.sellCount}}份</span>
-                  <span>好评率{{food.rating}}%</span></div>
-                <div class="price">
-                  <span class="now">￥{{food.price}}</span>
-                </div>
-                <div class="cartcontrol-wrapper">
-                  <CartControl/>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+  <div class="goods">
+  <div class="menu-wrapper" ref="leftWrapper">
+    <ul ref="leftUl">
+      <li 
+        class="menu-item" 
+        :class="{current : currentIndex === index}" 
+        v-for="(goods, index) in goods" 
+        :key="goods.name"
+        @click="clickItem(index)"
+      >
+        <span class="text bottom-border-1px">
+          <img class="icon" :src="goods.icon" v-if="goods.icon">
+          {{goods.name}}
+        </span>
+      </li>
+    </ul>
   </div>
+  <div class="foods-wrapper" ref="rightWrapper">
+    <ul ref="rightUl">
+      <li class="food-list-hook" v-for="goods in goods" :key="goods.name">
+        <h1 class="title">{{goods.name}}</h1>
+        <ul>
+          <li 
+            class="food-item bottom-border-1px" 
+            v-for="food in goods.foods" 
+            :key="food.name"
+            @click="showFood(food)"
+          >
+            <div class="icon">
+              <img width="57" height="57" :src="food.icon">
+            </div>
+            <div class="content">
+              <h2 class="name">{{food.name}}</h2>
+              <p class="desc">{{food.description}}</p>
+              <div class="extra">
+                <span class="count">月售{{food.sellCount}}份</span>
+                <span>好评率{{food.rating}}%</span></div>
+              <div class="price">
+                <span class="now">￥{{food.price}}</span>
+              </div>
+              <div class="cartcontrol-wrapper">
+                <CartControl :food="food"/>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <GoodCart/>
+  <Food :food="food" ref="food"/>
 </div>
 
 </template>
 
 <script type="text/ecmascript-6">
-  import BScroll from 'better-scroll'
-  import CartControl from '../../../components/CartControl/CartControl'
   import { mapState } from 'vuex'
+  import BScroll from 'better-scroll'
+  import GoodCart from './GoodCart/GoodCart'
+  import CartControl from '../../../components/CartControl/CartControl'
+  import Food from './Food/Food'
   export default {
     name: 'Goods',
     data() {
       return {
         scrollY: 0,
-        tops: []
+        tops: [],
+        food: {}
       }
+    },
+    mounted() {
+      this.$store.dispatch('getShopGoods')
     },
     computed: {
       ...mapState({
@@ -120,17 +131,21 @@
           tops.push(top)
         })
         this.tops = tops
-        console.log(tops);
-        
       },
       clickItem(index) {
         const top = this.tops[index]
         this.scrollY = top
         this.rightScroll.scrollTo(0, -top, 300)
+      },
+      showFood(food) {
+        this.food = food
+        this.$refs.food.toggle()
       }
     },
     components: {
-      CartControl
+      CartControl,
+      GoodCart,
+      Food
     }
   }
 </script>

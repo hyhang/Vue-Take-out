@@ -1,9 +1,17 @@
+import Vue from 'vue'
 import { reqGoods, reqInfo, reqRatings } from '../../api/'
-import { RECEIVE_INFO, RECEIVE_RATINGS, RECEIVE_GOODS } from '../mutation-types'
+import { 
+  RECEIVE_INFO, 
+  RECEIVE_RATINGS, 
+  RECEIVE_GOODS,
+  ADD_COUNT,
+  REDUCE_COUNT
+} from '../mutation-types'
 const state = {
   goods: [],
   info: {},
-  ratings: []
+  ratings: [],
+  cardFoods: []
 }
 
 const mutations = {
@@ -15,6 +23,23 @@ const mutations = {
   },
   [RECEIVE_GOODS](state, goods){
     state.goods = goods
+  },
+  [ADD_COUNT](state, food){
+    if (!food.hasOwnProperty('count')) {
+      Vue.set(food, 'count', 1)
+      state.cardFoods.push(food)
+    } else {
+      food.count++
+    }
+  },
+  [REDUCE_COUNT](state, food){
+    if (food.count > 0) {
+      food.count--
+      if (food.count === 0) {
+        delete food.count
+        state.cardFoods.splice(state.cardFoods.indexOf(food), 1)
+      }
+    }
   }
 }
 
@@ -46,11 +71,25 @@ const actions = {
       commit(RECEIVE_GOODS, goods)
       cb && cb()
     }
+  },
+
+  updateCount({commit}, {isAdd, food}) {
+    if (isAdd) {
+      commit(ADD_COUNT, food)
+    } else {
+      commit(REDUCE_COUNT, food)
+    }
   }
 }
 
 const getters = {
+  totalCount() {
+    return state.cardFoods.reduce((pre, food) => pre + food.count,0)
+  },
 
+  totalPrice() {
+    return state.cardFoods.reduce((pre, food) => pre + food.count * food.price, 0)
+  }
 }
 
 export default{
